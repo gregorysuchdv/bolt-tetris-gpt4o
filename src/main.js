@@ -1,12 +1,13 @@
 import './style.css';
     import { createGrid, drawGrid } from './grid.js';
-    import { createPiece, movePiece, rotatePiece, dropPiece, isValidMove } from './gameLogic.js';
+    import { createPiece, drawPiece, movePiece, rotatePiece, dropPiece, isValidMove } from './gameLogic.js';
 
     const gameElement = document.getElementById('game');
     const gridElement = gameElement.querySelector('.grid');
 
     const grid = createGrid(20, 10);
     let currentPiece = createPiece('I');
+    drawPiece(grid, currentPiece);
 
     function gameLoop() {
       if (dropPiece(grid, currentPiece)) {
@@ -15,6 +16,7 @@ import './style.css';
           alert('Game Over');
           grid.forEach(row => row.fill(0));
         }
+        drawPiece(grid, currentPiece);
       }
       drawGrid(grid, gridElement);
     }

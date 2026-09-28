@@ -31,6 +31,8 @@ import { drawGrid, clearLines } from './grid.js';
       });
     };
 
+    // Attention : la pièce testée doit être effacée de la grille avant l'appel,
+    // sinon ses propres cases sont vues comme occupées.
     export const isValidMove = (grid, piece, dx, dy, rotation) => {
       const { shape, position } = piece;
       const newRotation = rotation !== undefined ? rotation : piece.rotation;
@@ -42,6 +44,7 @@ import { drawGrid, clearLines } from './grid.js';
           return (
             newX >= 0 &&
             newX < grid[0].length &&
+            newY >= 0 &&
             newY < grid.length &&
             grid[newY][newX] === 0
           );
@@ -49,31 +52,29 @@ import { drawGrid, clearLines } from './grid.js';
       });
     };
 
+    // Renvoie true si le déplacement a eu lieu.
     export const movePiece = (grid, piece, dx, dy) => {
-      if (isValidMove(grid, piece, dx, dy)) {
-        undrawPiece(grid, piece);
+      undrawPiece(grid, piece);
+      const ok = isValidMove(grid, piece, dx, dy);
+      if (ok) {
         piece.position.x += dx;
         piece.position.y += dy;
-        drawPiece(grid, piece);
       }
+      drawPiece(grid, piece);
+      return ok;
     };
 
     export const rotatePiece = (grid, piece) => {
       const newRotation = (piece.rotation + 1) % piece.shape.length;
+      undrawPiece(grid, piece);
       if (isValidMove(grid, piece, 0, 0, newRotation)) {
-        undrawPiece(grid, piece);
         piece.rotation = newRotation;
-        drawPiece(grid, piece);
       }
+      drawPiece(grid, piece);
     };
 
     export const dropPiece = (grid, piece) => {
-      if (isValidMove(grid, piece, 0, 1)) {
-        movePiece(grid, piece, 0, 1);
-      } else {
-        drawPiece(grid, piece);
-        clearLines(grid);
-        return true; // Piece has landed
-      }
-      return false;
+      if (movePiece(grid, piece, 0, 1)) return false;
+      clearLines(grid);
+      return true; // Piece has landed
     };
